@@ -1,0 +1,36 @@
+from flask import Flask, render_template_string
+
+app = Flask(__name__)
+
+# HTML template for the form
+HTML_TEMPLATE = '''
+<!doctype html>
+<html>
+<head><title>Example Intake Form</title></head>
+<body>
+  <h1>Example Intake Form</h1>
+  <form action="/submit" method="post">
+    {% for field_name in form_fields %}
+    <label for="{{field_name}}">{{field_name.replace("_", " ").title()}}</label>
+    <input type="text" id="{{field_name}}" name="{{field_name}}">
+    <br><br>
+    {% endfor %}
+    <input type="submit" value="Submit">
+  </form>
+</body>
+</html>
+'''
+
+@app.route('/')
+def form():
+    # Form fields based on the dictionary keys, leaving values blank
+    form_fields = ['Age', 'Location', 'Occupation', 'Person_Name', 'Physical_Attribute']
+    return render_template_string(HTML_TEMPLATE, form_fields=form_fields)
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    # Placeholder for form submission handling
+    return 'Form submitted!'
+
+if __name__ == '__main__':
+    app.run(debug=True)

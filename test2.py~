@@ -1,0 +1,60 @@
+# Process audio file
+from icecream import ic
+import symbl
+import requests
+
+local_path = r'test_audio.m4a'
+conversation_object = symbl.Audio.process_file(
+file_path=local_path)
+conv_id = conversation_object.get_conversation_id()
+
+# url = f"https://api.symbl.ai/v1/conversations/{conv_id}/entities"
+# headers = {"accept": "application/json"}
+# response = requests.get(url, headers=headers)
+
+def auth():
+    url = "https://api.symbl.ai/oauth2/token:generate"
+
+    payload = {
+        "type": "application",
+        "appId": "6a7a35426f52716373754a7247626b4e4562477a48676248464a686a4b626c44",
+        "appSecret": "4f675f567373456347574c487148734c62437067444575626358473655394963647033624f4250556451514949424b5431504f375a41303254595f486f346e67"
+    }
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json"
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+
+    print(response.json()["accessToken"])
+
+    access_token = response.json()["accessToken"]
+    return access_token
+
+def entities(auth_tok, conv_id):
+    import requests
+
+    url = f"https://api.symbl.ai/v1/conversations/{conv_id}/entities"
+
+    headers = {
+        "accept": "application/json",
+        "authorization": f"Bearer {auth_tok}",
+    }
+
+    response = requests.get(url, headers=headers)
+
+    data = response.json()
+
+    simplified_dict = {}
+
+    for entity in data['entities']:
+        # Assuming each 'subType' is unique and only the first 'detectedValue' is needed
+        if entity['matches']:  # Check if there are any matches to avoid errors
+            simplified_dict[entity['subType']] = entity['matches'][0]['detectedValue']
+
+    return simplified_dict
+
+auth1 = auth()
+discoveries = entities(auth1, conv_id)
+ic(discoveries)

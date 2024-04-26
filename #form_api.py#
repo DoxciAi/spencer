@@ -1,0 +1,61 @@
+from flask import Flask, render_template_string
+
+app = Flask(__name__)
+
+# HTML template for the form
+HTML_TEMPLATE = '''
+<!doctype html>
+<html>
+<head>
+  <title>Example Intake Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 8px; }
+    tr:nth-child(even) { background-color: #f2f2f2; }
+    input[type=text] { width: 95%; }
+  </style>
+</head>
+<body>
+  <h1>Example Intake Form</h1>
+  <form action="/submit" method="post">
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Value</th>
+      </tr>
+      {% for field_name in form_fields %}
+      <tr>
+        <td>{{ field_name.replace("_", " ").title() }}</td>
+        <td><input type="text" id="{{ field_name }}" name="{{ field_name }}"></td>
+      </tr>
+      {% endfor %}
+    </table>
+    <br>
+    <input type="submit" value="Submit">
+  </form>
+</body>
+</html>
+'''
+@app.route('/')
+def form():
+    # Form fields based on the dictionary keys, leaving values blank
+    form_fields = ['Age', 'Location', 'Occupation', 'Person_Name', 'Physical_Attribute']
+    return render_template_string(HTML_TEMPLATE, form_fields=form_fields)
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    # Placeholder for form submission handling
+    return 'Form submitted!'
+
+if __name__ == '__main__':
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('', 0))  # Bind to an arbitrary free port
+        s.listen(1)
+        port = s.getsockname()[1]  # Get the port number assigned by OS
+
+    # Now that we have an arbitrary free port, let's start the Flask app on that port.
+    print(f"Starting server on port {port}")
+    app.run(port=port, debug=True)
+    
