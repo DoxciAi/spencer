@@ -26,18 +26,18 @@ async function handleWebSocketConnection(apiUrl, mic, presetTargets) {
             encoding: 'LINEAR16',
             sampleRateHertz: 16000
           },
-          //customVocabulary Array Of really different vocabulary, like company specific things
-          //disconnectOnStopRequest enables resume and start options --  gotta check that out
-          //disconnectOnStopRequestTimeout defines timout for closing the webSocket (default is also max 30min)
-          //insightTypes can be either question or action_item -- Its an array of strings
-          //noConnectionTimeout makes the webSocket be open for the time passed
-          speaker: {
-            name: 'Roberto',
-            userId: uuid(),
-          },
-          //trackers is an optional object to enable trackers, if not defined, there is a default config
-          //actions as sendSummary by email (The only action supported)
         },
+        //customVocabulary Array Of really different vocabulary, like company specific things
+        //disconnectOnStopRequest enables resume and start options --  gotta check that out
+        //disconnectOnStopRequestTimeout defines timout for closing the webSocket (default is also max 30min)
+        //insightTypes can be either question or action_item -- Its an array of strings
+        //noConnectionTimeout makes the webSocket be open for the time passed
+        speaker: {
+          name: 'Roberto',
+          userId: uuid(),
+        },
+        //trackers is an optional object to enable trackers, if not defined, there is a default config
+        //actions as sendSummary by email (The only action supported)
       };
 
       // Send the start_request message as JSON string
@@ -91,7 +91,7 @@ async function handleWebSocketConnection(apiUrl, mic, presetTargets) {
       else if (data.type === 'entity_response') {
         if (data.entities) {
           let entityMatches = {};
-          if (speakerName) entityMatches.speakerName = speakerName; //if there is a speaker defined then add speaker name to response object
+          if (speakerName) entityMatches.speaker = speakerName; //if there is a speaker defined then add speaker name to response object
           data.entities.forEach((entity) => {
             if (presetTargets.includes(entity.subType)) {
               entity.matches.forEach((match) => {
