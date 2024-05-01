@@ -1,7 +1,7 @@
 import sys
 import json
 
-input = json.loads(sys.argv[1])
+# input = json.loads(sys.argv[1])
 
 # messages = []
 # for person in input:

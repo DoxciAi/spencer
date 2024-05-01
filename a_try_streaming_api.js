@@ -1,12 +1,9 @@
 import { spawn } from 'node:child_process';
 import WebSocket from 'ws';
-import { config } from 'dotenv';
 import { v4 as uuid } from 'uuid';
-import { MicrophoneHandler } from './utils/mic_handler.js'
-import { AuthToken } from './utils/auth.js';
-import { RequestCustomEntity } from './utils/createCustomEntity.js';
 
-async function handleWebSocketConnection(apiUrl, mic, presetTargets) {
+
+export default function handleTanscriptions(apiUrl, mic, presetTargets) {
   try {
     const ws = new WebSocket(apiUrl);
     let speakerName;
@@ -56,7 +53,6 @@ async function handleWebSocketConnection(apiUrl, mic, presetTargets) {
         else if (data && data.message.type == 'conversation_created') {
           //This means I will finally have a conversationId
           console.log("Conversation created")
-          conversationId = data.message.data.conversationId;
         }
         else if (data && data.message.type == 'recognition_started') {
           console.log("Recognition Started. Ready to Process Audio!!!!")
@@ -76,12 +72,13 @@ async function handleWebSocketConnection(apiUrl, mic, presetTargets) {
         }
         else if (data && data.message.type == 'conversation_completed') {
           console.log("Last message from API. Real-time conversation closed!!");
+          return false;
         }
       }
       else if (data.type == 'message_response') {
         console.log("Final Transcript for a Message!!");
         data.messages.forEach((message) => {
-          console.log(message);
+          console.log(message.payload.content);
           if (message.from && message.from.name) { // check later if this actually works
           speakerName = message.from.name;
           }
@@ -117,87 +114,3 @@ async function handleWebSocketConnection(apiUrl, mic, presetTargets) {
       console.error('WebSocket error:', error);
     }
 }
-
-//I RUN EVERYTHING HERE
-console.log('running the script');
-const id = uuid();
-let conversationId;
-config(); //getting access to dotenv variables
-const micOptions = {
-  rate: 8000,
-  channels: '1',
-  debug: false,
-  exitOnSilence: 6,
-};
-const presetTargets = ['Time', 'Date', 'Location_Country', 'Person_Name', 'Brand'];
-const customEntity = {
-  type: 'Car',
-  subType: 'Brand',
-  category: 'Custom',
-  values: ['Toyota', 'BMW', 'Audi', 'Mercedes', 'Brand', 'Fiat', 'Pegeout', 'Ford', 'Ferrari']
-};
-const micHandler = new MicrophoneHandler(micOptions);
-const authToken = new AuthToken(process.env.APP_ID, process.env.APP_SECRET);
-const accessToken = await authToken.getAccessToken();
-// const customEntityManager = new RequestCustomEntity(customEntity);
-// const entityResponse = await customEntityManager.createNewEntity(accessToken);
-// console.log(entityResponse);
-const apiUrl = `wss://api.symbl.ai/v1/streaming/${id}?access_token=${accessToken}`;
-console.log('starting the WebSocket requests')
-handleWebSocketConnection(apiUrl, micHandler, presetTargets);
-
-
-
-
-// USE FOR OTHER APIs REQUESTS
-// const response_streaming_body =
-//   axios.post(apiUrl, requestBody)
-// .then(response => {
-//   console.log('Response Successfull');
-//   // Handle response data as needed
-// })
-// .catch(error => {
-//   console.error('Error:', error);
-//   // Handle error as needed
-// });
-
-// console.log(response_streaming_body)
-
-/* THIS REFERS TO SDK API WAY OF CONNECTING*/
-// import sdk from '@api/symblai';
-// sdk.connectToSipPstn({
-//   operation: 'start',
-//   data: {
-//     session: {location: {timeZone: {offset: 0}}}
-//   },
-//   intents: [{intent: 'answering_machine'}],
-//   callbackUrl: 'https://webhook.yourdomain.com/2328179',
-//   actions: [{invokeOn: 'start'}]
-// }, {connect: ':connect'})
-//   .then(({ data }) => console.log(data))
-//   .catch(err => console.error(err));
-
-// function handleRecognitionResult(data) {
-//       // Extract relevant information from the recognition result message
-//       const isFinal = data.message.isFinal;
-//       const alternatives = data.message.payload.raw.alternatives;
-//       const punctuatedTranscript = data.message.punctuated.transcript;
-//       const user = data.message.user;
-
-//       // Process the recognition result based on your requirements
-//       console.log('Received recognition result:');
-//       console.log('Is Final:', isFinal);
-//       console.log('Punctuated Transcript:', punctuatedTranscript);
-//       console.log('User ID:', user.userId);
-//       console.log('User Name:', user.name);
-
-//       // If the result is final, you can use the punctuated transcript
-//       if (isFinal) {
-//         console.log('Definitive Transcript:', punctuatedTranscript);
-//         setTimeout(() => {}, 2000);
-//       } else {
-//           // If the result is not final, you might want to consider
-//           // waiting for the final result before logging the definitive transcript
-//           console.log('Waiting for the final result to generate definitive transcript.');
-//       }
-// }
