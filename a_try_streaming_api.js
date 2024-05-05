@@ -90,20 +90,31 @@ export default function handleTanscriptions(apiUrl, mic, presetTargets) {
           let entityMatches = {};
           if (speakerName) entityMatches.speaker = speakerName; //if there is a speaker defined then add speaker name to response object
           data.entities.forEach((entity) => {
-            if (presetTargets.includes(entity.subType)) {
               entity.matches.forEach((match) => {
                 entityMatches[entity.subType] = match.detectedValue;
               });
-            }
           });
           //Sending complete entity object to RPA Manager
           //Maybe We will have to Set a Queue for this, so it will run only on completion of previous async task
           if (Object.keys(entityMatches).length > 0) {
-            console.log('Entity Detected:', entityMatches);
-            const pythonProcess = spawn('python', ["./test-sys.py", JSON.stringify(entityMatches)], { stdio: 'inherit' });
+            // console.log('Entity Detected:', entityMatches);
+            // const pythonProcess = spawn('python', ["./test-sys.py", JSON.stringify(entityMatches)], { stdio: 'inherit' });
           }
         }
-      };
+      }
+      else if (data.type === 'tracker_response'){
+        let trackerMatches = {};
+        data.trackers.forEach((tracker) => {
+          tracker.matches.forEach((match) => {
+            trackerMatches[tracker.type] = match.type;
+            match.messageRefs.forEach((messageRef) => {
+              trackerMatches.messageRefs = messageRef.text;
+            });
+          });
+        })
+        console.log('Tracker Response')
+        console.log(trackerMatches);
+      }
     });
 
     ws.on('error', (error) => {
