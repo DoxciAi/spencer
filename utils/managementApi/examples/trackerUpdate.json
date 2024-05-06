@@ -1,0 +1,5 @@
+{
+  "op": "add / replace (choose one of this operations)",  
+  "path": "/vocabulary (can also be /name , /description, /categories, /languages)", 
+  "value": "My name is Rodrigo"
+}
