@@ -1,7 +1,7 @@
 // USE THIS TO CREATE OR INTERACT WITH MANAGEMENT API
-import AuthToken from './auth';
-import { RequestCustomEntity } from './managementApi/entities';
-import { TrackerAPI } from './managementApi/trackers';
+import AuthToken from '../utils/auth';
+import { RequestCustomEntity } from './endpoints/entities';
+import { TrackerAPI } from './endpoints/trackers';
 import { config } from 'dotenv';
 
 config();
