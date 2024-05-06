@@ -1,18 +1,18 @@
 export class RequestCustomEntity {
 
-  constructor(entity) {
-    this.entity = entity; //can be a object or an array of objects
+  constructor(accessToken) {
+    this.accessToken = accessToken; //can be a object or an array of objects
   }
 
-  async createNewEntity(accessToken) {
+  async createNewEntity(entity) {
     const options = {
       method: 'POST',
       headers: {
         accept: 'application/json', 
-        'x-api-key': accessToken
+        'x-api-key': this.accessToken
       , 'content-type': 'application/json'
     },
-      body: JSON.stringify(this.entity)
+      body: JSON.stringify(entity)
     };
 
     const response = await fetch('https://api.symbl.ai/v1/manage/entities', options);
@@ -20,15 +20,15 @@ export class RequestCustomEntity {
     return data;
   }
 
-  async createNewEntities(accessToken) {
+  async createNewEntities(entities) {
     const options = {
       method: 'POST',
       headers: {
         accept: 'application/json', 
-        'x-api-key': accessToken
+        'x-api-key': this.accessToken
       , 'content-type': 'application/json'
     },
-      body: JSON.stringify(this.entity)
+      body: JSON.stringify(entities)
     };
 
     const response = await fetch('https://api.symbl.ai/v1/manage/entities/bulk', options);
