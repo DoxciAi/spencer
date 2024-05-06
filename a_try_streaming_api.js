@@ -1,6 +1,8 @@
 import { spawn } from 'node:child_process';
 import WebSocket from 'ws';
 import { v4 as uuid } from 'uuid';
+import fs from 'fs';
+import path from 'path';
 
 
 export default function handleTanscriptions(apiUrl, mic, presetTargets) {
@@ -102,18 +104,23 @@ export default function handleTanscriptions(apiUrl, mic, presetTargets) {
           }
         }
       }
-      else if (data.type === 'tracker_response'){
-        let trackerMatches = {};
+      else if (data.type === 'tracker_response') {
+        let i = 0;
         data.trackers.forEach((tracker) => {
+          let trackerMatch = {};
+          trackerMatch.name = tracker.name;
           tracker.matches.forEach((match) => {
-            trackerMatches[tracker.type] = match.type;
+            trackerMatch.type = match.type;
             match.messageRefs.forEach((messageRef) => {
-              trackerMatches.messageRefs = messageRef.text;
+              trackerMatch.messageRefs = messageRef.text;
             });
           });
-        })
-        console.log('Tracker Response')
-        console.log(trackerMatches);
+          const filePath = path.join('./', 'data', `tracker_${trackerMatch.name}_${i++}.json`);
+          fs.writeFile(filePath, JSON.stringify(trackerMatch, null, 2), (err) => {
+              if (err) throw err;
+              console.log(`Tracker has been saved!`);
+          });
+        });
       }
     });
 
