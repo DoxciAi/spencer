@@ -1,11 +1,11 @@
 import { MicrophoneHandler } from './utils/mic_handler.js'
 import { AuthToken } from './utils/auth.js';
-import { RequestCustomEntity } from './utils/managementApi/entities.js';
+import { RequestCustomEntity } from './managementApi/endpoints/entities.js';
 import { config } from 'dotenv';
 import { v4 as uuid } from 'uuid';
 import { spawn } from 'node:child_process';
 import handleTranscriptions from './a_try_streaming_api.js';
-import { TrackerAPI } from './utils/managementApi/trackers.js';
+import { TrackerAPI } from './managementApi/endpoints/trackers.js';
 
 
 // Initialize configurations
